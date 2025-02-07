@@ -37,35 +37,28 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const signup = (email, password) => {
-        const usersStorage = JSON.parse(localStorage.getItem("users_db"));
-    
+    const signup = (nome, email, password) => {
+        const usersStorage = JSON.parse(localStorage.getItem("users_db")) || [];
+
         const hasUser = usersStorage.some((user) => user.email === email);
-    
-        if (hasUser?.length) {
+
+        if (hasUser) {
             return "E-mail já cadastrado";
         }
-    
-        let newUser;
 
-        if (usersStorage){
-            newUser = [...usersStorage, { email, password }];
-        }else {
-            newUser = [{ email, password }];
-        }
-
+        const newUser = [...usersStorage, { nome, email, password }];
         localStorage.setItem("users_db", JSON.stringify(newUser));
 
-        return;
+        return null;
     };
 
-    const sigout = () => {
+    const signout = () => {
         setUser(null);
         localStorage.removeItem("user_token");
     };
 
     return (<AuthContext.Provider
-        value={{user, signed: !!user, signin, signup, sigout }}
+        value={{user, signed: !!user, signin, signup, signout }}
         >
         {children}
         </AuthContext.Provider>

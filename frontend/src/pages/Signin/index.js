@@ -14,7 +14,7 @@ const Signin = () => {
     const [error, setError] = useState("");
 
     const handleLogin = () => {
-        if (!email || !senha) {  // Corrigido | para || (OR lógico)
+        if (!email || !senha) { 
             setError("Preencha todos os campos");
             return;
         }

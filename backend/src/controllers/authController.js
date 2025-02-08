@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 const registerUser = async (req, res) => {
+    console.log("JWT_SECRET ao gerar token:", process.env.JWT_SECRET);
+
     const { nome, email, senha } = req.body;
 
     console.log("Recebido no req.body:", req.body); 
@@ -72,4 +74,19 @@ const loginUser = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser };
+const getUser = async (req, res) => {
+    try {
+        // ID do usuário vindo do token JWT
+        const user = await User.findById(req.user.id).select("-senha");  // Usamos o id que veio no token
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado" });
+        }
+
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Erro no servidor" });
+    }
+};
+
+module.exports = { registerUser, loginUser, getUser };

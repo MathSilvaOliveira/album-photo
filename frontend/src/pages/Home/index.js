@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
 import * as C from "./styles";
@@ -9,12 +10,65 @@ const Home = () => {
     const { signout } = useAuth();
     const navigate = useNavigate();
 
+    const [user, setUser] = useState(null);  
+    const [albums, setAlbums] = useState([]); 
+
+    useEffect(() => {
+        
+        const token = localStorage.getItem("token");
+        if (token) {
+            
+            const userData = JSON.parse(atob(token.split('.')[1]));  
+            console.log(userData);
+            setUser(userData);  
+
+            axios.get("http://localhost:5000/auth/albuns", {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(response => {
+                setAlbums(response.data);  
+            })
+            .catch(error => {
+                console.error("Erro ao buscar álbuns", error);
+            });
+            axios.get("http://localhost:5000/auth/user", {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(response => {
+                setUser(response.data);  
+            })
+            .catch(error => {
+                console.error("Erro ao buscar dados do usuário", error);
+            });
+        } else {
+            navigate("/"); 
+        }
+    }, [navigate]);
+
     return (
         <C.Container>
-            <C.Title>Home</C.Title>
+            {user && <C.UserName>Bem-vindo, {user.nome}!</C.UserName>}
+            
             <Button Text="Sair" onClick={() => [signout(), navigate("/")]}>Sair</Button>
+            
+            <C.AlbumsContainer>
+                <C.AlbumList>
+                    {albums.length > 0 ? (
+                        albums.map((album) => (
+                            <C.AlbumItem key={album._id}>
+                                <C.AlbumTitle>{album.titulo}</C.AlbumTitle>
+                                <C.AlbumDescription>{album.descricao}</C.AlbumDescription>
+                                <Button Text="Ver Álbum" onClick={() => navigate(`/album/${album._id}`)} />
+                            </C.AlbumItem>
+                        ))
+                    ) : (
+                        <p>Você ainda não tem álbuns.</p>
+                    )}
+                </C.AlbumList>
+                <Button Text="Criar Álbum" onClick={() => navigate("/criar-album")} />
+            </C.AlbumsContainer>
         </C.Container>
-    )
-}
+    );
+};
 
 export default Home;

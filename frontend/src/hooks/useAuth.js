@@ -30,8 +30,14 @@ const useAuth = () => {
     }
   };
 
+  const signout = () => {
+    localStorage.removeItem("token");  
+    setIsAuthenticated(false);         
+  };
+
   return {
     signin,
+    signout,
     isAuthenticated,
   };
 };

@@ -34,6 +34,8 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
     const { email, senha } = req.body;
 
+    console.log("Dados recebidos para login:", req.body);  
+
     if (!email || !senha) {
         return res.status(400).json({ message: "Preencha todos os campos" });
     }
@@ -41,17 +43,21 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email });
 
+        console.log("Usuário encontrado:", user);  
+
         if (!user) {
             return res.status(401).json({ message: "E-mail ou senha incorretos" });
         }
 
-        const isPasswordCorrect = await bcrypt.compare(senha, user.password);
+        const isPasswordCorrect = await bcrypt.compare(senha, user.senha);
 
         if (!isPasswordCorrect) {
             return res.status(401).json({ message: "E-mail ou senha incorretos" });
         }
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+        console.log("Token gerado:", token);  
 
         res.json({
             token,
@@ -61,7 +67,7 @@ const loginUser = async (req, res) => {
             },
         });
     } catch (error) {
-        console.error("Erro no servidor:", error); 
+        console.error("Erro no servidor:", error);  
         res.status(500).json({ message: "Erro no servidor" });
     }
 };

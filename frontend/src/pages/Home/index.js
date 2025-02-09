@@ -23,10 +23,15 @@ const Home = () => {
             setUser(userData);  
 
             axios.get("http://localhost:5000/auth/albuns", {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}`, },
             })
             .then(response => {
-                setAlbums(response.data);  
+                    // Verificando se a resposta é um array de álbuns
+                    if (Array.isArray(response.data)) {
+                        setAlbums(response.data);  
+                      } else {
+                        console.error("Formato de resposta inválido para álbuns");
+                      } 
             })
             .catch(error => {
                 console.error("Erro ao buscar álbuns", error);

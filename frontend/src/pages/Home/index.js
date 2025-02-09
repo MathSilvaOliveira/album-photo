@@ -47,7 +47,7 @@ const Home = () => {
 
     return (
         <C.Container>
-            {user && <C.UserName>Bem-vindo, {user.nome}!</C.UserName>}
+            {user && <C.UserName>Olá, {user.nome}!</C.UserName>}
             
             <Button Text="Sair" onClick={() => [signout(), navigate("/")]}>Sair</Button>
             

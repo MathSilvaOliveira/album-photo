@@ -4,10 +4,10 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// 🔹 Rota para buscar os dados do usuário autenticado
+
 router.get("/user", authMiddleware, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select("-senha"); // Remove a senha da resposta
+        const user = await User.findById(req.user.id).select("-senha"); 
         if (!user) {
             return res.status(404).json({ message: "Usuário não encontrado" });
         }

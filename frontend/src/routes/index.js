@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "../pages/Home";
+import CriarAlbum from "../pages/CreateAlbum/CriarAlbum";
 import Signin from "../pages/Signin";
 import Signup from "../pages/Signup";
 import useAuth from "../hooks/useAuth"; 
@@ -16,6 +17,7 @@ const RoutesApp = () => {
       <Fragment>
         <Routes>
           <Route path="/home" element={<Private Item={Home} />} />
+          <Route path="/criar-album" element={<CriarAlbum />} />
           <Route path="/" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="*" element={<Signin />} />

@@ -18,6 +18,21 @@ router.get('/albuns', authMiddleware, async (req, res) => {
       res.status(500).json({ error: 'Erro ao buscar álbuns' });
     }
   });
+
+// Rota para buscar um álbum por ID
+router.get('/album/:id', async (req, res) => {
+  try {
+      const album = await Album.findById(req.params.id).populate('usuario');
+      if (!album) {
+          return res.status(404).json({ error: 'Álbum não encontrado' });
+      }
+      res.status(200).json(album);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Erro ao buscar o álbum' });
+  }
+});
+
   
 
 module.exports = router;

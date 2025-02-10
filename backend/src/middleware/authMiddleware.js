@@ -12,6 +12,11 @@ const authMiddleware = (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded; // Adiciona os dados do usuário ao request
+
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ message: "Usuário não encontrado no token." });
+        }
+        
         next();
     } catch (error) {
         res.status(401).json({ message: "Token inválido." });

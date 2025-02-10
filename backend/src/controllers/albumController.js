@@ -28,7 +28,7 @@ async function createAlbum(req, res) {
       titulo,
       descricao,
       imagens: imagens.map(img => img.filename),
-      usuario: req.usuarioId,
+      usuario: req.user.id,
     });
 
     await novoAlbum.save();

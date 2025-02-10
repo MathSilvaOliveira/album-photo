@@ -12,6 +12,27 @@ const useAuth = () => {
     }
   }, []);  
 
+  const signup = async (nome, email, senha) => {
+    try {
+      console.log("Enviando dados para cadastro:", { nome, email, senha });
+      const response = await axios.post("http://localhost:5000/auth/signup", {
+        nome,
+        email,
+        senha,
+      });
+      console.log("Resposta do backend:", response.data);
+      
+      // Salvar token após cadastro
+      localStorage.setItem("token", response.data.token);
+      setIsAuthenticated(true);
+
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao cadastrar usuário:", error);
+      return error.response?.data?.message || "Erro no servidor";
+    }
+  };
+
   const signin = async (email, senha) => {
     try {
       console.log("Enviando dados para login:", { email, senha });
@@ -36,6 +57,7 @@ const useAuth = () => {
   };
 
   return {
+    signup,
     signin,
     signout,
     isAuthenticated,

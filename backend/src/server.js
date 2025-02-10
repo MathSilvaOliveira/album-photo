@@ -1,9 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const connectDB = require("./src/config/db");
-const authRoutes = require("./src/routes/authRoutes");
-const userRoutes = require("./src/routes/userRoutes");  
-const albumsRoutes = require("./routes/albumsRoutes");
+const connectDB = require("./config/db");
+const userRoutes = require("./routes/userRoutes");  
+const albumsRoutes = require("./routes/albumRoutes");
 
 require("dotenv").config();
 console.log("JWT_SECRET no servidor:", process.env.JWT_SECRET);

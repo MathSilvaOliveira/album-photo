@@ -15,7 +15,7 @@ const Signup = () => {
     const [senha, setSenha] = useState("");
     const [error, setError] = useState("");
 
-    const handleSignup = () => {
+    const handleSignup = async () => {
         if (!nome || !email || !emailConf || !senha) {
             setError("Preencha todos os campos");
             return;
@@ -24,15 +24,20 @@ const Signup = () => {
             setError("Os e-mails não coincidem");
             return;
         }
-
-        const res = signup(nome, email, senha);
-
-        if (res) {
-            setError(res);
-            return;
+    
+        try {
+            const res = await signup(nome, email, senha); 
+    
+            if (res && res.error) { 
+                setError(res.error);
+                return;
+            }
+    
+            navigate("/");
+        } catch (err) {
+            setError("Erro ao cadastrar. Tente novamente mais tarde.");
+            console.error(err);
         }
-
-        navigate("/");
     };
 
     return (

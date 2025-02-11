@@ -33,6 +33,26 @@ router.get('/album/:id', async (req, res) => {
   }
 });
 
+router.delete('/album/:id', authMiddleware, async (req, res) => {
+  try {
+      const album = await Album.findById(req.params.id);
+
+      if (!album) {
+          return res.status(404).json({ error: 'Álbum não encontrado' });
+      }
+
+      // Verifica se o álbum tem fotos antes de excluir
+      if (album.fotos.length > 0) {
+          return res.status(400).json({ error: 'Não é possível excluir um álbum que contém fotos' });
+      }
+
+      await Album.findByIdAndDelete(req.params.id);
+      res.status(200).json({ message: 'Álbum excluído com sucesso' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Erro ao excluir o álbum' });
+  }
+});
   
 
 module.exports = router;

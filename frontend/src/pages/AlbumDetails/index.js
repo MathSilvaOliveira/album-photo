@@ -1,12 +1,25 @@
+// frontend/AlbumDetail/index.js
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import UploadFotos from "./UploadFotos"; // Importando o novo componente
 
 const AlbumDetail = () => {
     const { albumId } = useParams();
     const navigate = useNavigate();
     const [album, setAlbum] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    // Mova a definição da função `refreshAlbum` aqui
+    const refreshAlbum = async () => {
+        try {
+            const response = await axios.get(`http://localhost:5000/auth/album/${albumId}`);
+            setAlbum(response.data);
+        } catch (error) {
+            console.error("Erro ao buscar os detalhes do álbum", error);
+        }
+    };
 
     useEffect(() => {
         const fetchAlbumDetails = async () => {
@@ -54,22 +67,24 @@ const AlbumDetail = () => {
             <p style={{ textAlign: "left", color: "#555" }}>{album.descricao}</p>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginTop: "20px" }}>
-                      {album.fotos && album.fotos.length > 0 ? (
-                        album.fotos.map((foto, index) => (
-                           <div key={index} style={{ textAlign: "center" }}>
-                              {console.log(`Renderizando tag <img> para: http://localhost:5000/uploads/${foto.filename}`)}
+                {album.fotos && album.fotos.length > 0 ? (
+                    album.fotos.map((foto, index) => (
+                        <div key={index} style={{ textAlign: "center" }}>
+                            {console.log(`Renderizando tag <img> para: http://localhost:5000/uploads/${foto.filename}`)}
                             <img
-                              src={`http://localhost:5000/uploads/${foto.filename}`}
-                              alt={foto.titulo}
-                              style={{ width: "100%", height: "auto", borderRadius: "8px" }}
+                                src={`http://localhost:5000/uploads/${foto.filename}`}
+                                alt={foto.titulo}
+                                style={{ width: "100%", height: "auto", borderRadius: "8px" }}
                             />
-                    </div>
-                ))
-             ) : (
-                <p>Nenhuma imagem disponível.</p>
-            )}
-        </div>
+                        </div>
+                    ))
+                ) : (
+                    <p>Nenhuma imagem disponível.</p>
+                )}
+            </div>
 
+            {/* Adicionando o novo componente UploadFotos */}
+            <UploadFotos albumId={albumId} onFotosAdicionadas={refreshAlbum} />
 
             <button
                 onClick={handleDeleteAlbum}

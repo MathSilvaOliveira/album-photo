@@ -47,4 +47,37 @@ const createAlbum = async (req, res) => {
     }
 };
 
-module.exports = { createAlbum, upload };
+const addPhotosToAlbum = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const imagens = req.files;
+
+        if (!imagens || imagens.length === 0) {
+            return res.status(400).json({ error: 'Ao menos uma imagem é obrigatória' });
+        }
+
+        const fotos = imagens.map(img => ({
+            filename: img.filename,
+            titulo: img.originalname,
+            descricao: "Foto carregada",
+            dataDeAquisicao: new Date(),
+            tamanho: img.size,
+            corPredominante: "Desconhecido"
+        }));
+
+        const album = await Album.findById(id);
+        if (!album) {
+            return res.status(404).json({ error: 'Álbum não encontrado' });
+        }
+
+        album.fotos.push(...fotos);
+        await album.save();
+
+        res.status(200).json({ message: 'Fotos adicionadas com sucesso', album });
+    } catch (error) {
+        console.error('Erro ao adicionar fotos ao álbum', error);
+        res.status(500).json({ error: 'Erro ao adicionar fotos ao álbum, tente novamente' });
+    }
+};
+
+module.exports = { createAlbum, upload, addPhotosToAlbum };

@@ -1,11 +1,13 @@
 const express = require('express');
-const { createAlbum, upload } = require('../controllers/albumController');
+const { createAlbum, upload, addPhotosToAlbum } = require('../controllers/albumController');
 const router = express.Router();
 const Album = require("../models/Album");
 const authMiddleware = require("../middleware/authMiddleware")
 
 // Rota para criar álbum
 router.post('/albuns', authMiddleware, upload.array('imagens'), createAlbum); // Usando a função createAlbum do controller
+
+router.post('/album/:id/fotos', authMiddleware, upload.array('imagens'), addPhotosToAlbum);
 
 // Rota para buscar os álbuns de um usuário
 router.get('/albuns', authMiddleware, async (req, res) => {

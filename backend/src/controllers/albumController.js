@@ -15,17 +15,17 @@ const upload = multer({ storage: storage });
 
 const createAlbum = async (req, res) => {
     try {
-        const { titulo, descricao } = req.body;
+        const { titulo, descricao, fotosInfo } = req.body; // Adicionar fotosInfo ao corpo da solicitação
         const imagens = req.files;
 
         if (!titulo || !descricao || !imagens || imagens.length === 0) {
             return res.status(400).json({ error: 'Título, descrição e ao menos uma imagem são obrigatórios' });
         }
 
-        const fotos = imagens.map(img => ({
+        const fotos = imagens.map((img, index) => ({
             filename: img.filename,
-            titulo: img.originalname,
-            descricao: "Foto carregada",
+            titulo: fotosInfo[index]?.titulo || img.originalname,
+            descricao: fotosInfo[index]?.descricao || "Foto carregada",
             dataDeAquisicao: new Date(),
             tamanho: img.size,
             corPredominante: "Desconhecido"
@@ -47,19 +47,21 @@ const createAlbum = async (req, res) => {
     }
 };
 
+
 const addPhotosToAlbum = async (req, res) => {
     try {
         const { id } = req.params;
+        const { fotosInfo } = req.body; // Adicionar fotosInfo ao corpo da solicitação
         const imagens = req.files;
 
         if (!imagens || imagens.length === 0) {
             return res.status(400).json({ error: 'Ao menos uma imagem é obrigatória' });
         }
 
-        const fotos = imagens.map(img => ({
+        const fotos = imagens.map((img, index) => ({
             filename: img.filename,
-            titulo: img.originalname,
-            descricao: "Foto carregada",
+            titulo: fotosInfo[index]?.titulo || img.originalname,
+            descricao: fotosInfo[index]?.descricao || "Foto carregada",
             dataDeAquisicao: new Date(),
             tamanho: img.size,
             corPredominante: "Desconhecido"

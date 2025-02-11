@@ -1,62 +1,75 @@
-// frontend/AlbumDetail/UploadFotos.js
-
 import React, { useState } from 'react';
 import axios from 'axios';
 
 const UploadFotos = ({ albumId, onFotosAdicionadas }) => {
-    const [fotos, setFotos] = useState([]);
+    const [imagens, setImagens] = useState([]);
+    const [fotosInfo, setFotosInfo] = useState([]);
 
     const handleFileChange = (e) => {
-        setFotos(e.target.files);
-        handleUpload(e.target.files); // Chama a função de upload automaticamente
+        setImagens(e.target.files);
     };
 
-    const handleUpload = async (selectedFiles) => {
+    const handleInputChange = (index, field, value) => {
+        const updatedFotosInfo = [...fotosInfo];
+        updatedFotosInfo[index] = {
+            ...updatedFotosInfo[index],
+            [field]: value,
+        };
+        setFotosInfo(updatedFotosInfo);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         const formData = new FormData();
-        for (let i = 0; i < selectedFiles.length; i++) {
-            formData.append('imagens', selectedFiles[i]);
+
+        for (let i = 0; i < imagens.length; i++) {
+            formData.append('imagens', imagens[i]);
+            formData.append(`fotosInfo[${i}][titulo]`, fotosInfo[i]?.titulo || "");
+            formData.append(`fotosInfo[${i}][descricao]`, fotosInfo[i]?.descricao || "");
         }
 
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Você precisa estar logado para fazer upload de fotos.");
+                return;
+            }
+
             await axios.post(`http://localhost:5000/auth/album/${albumId}/fotos`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,  // Incluindo o token no cabeçalho
                 },
             });
             alert('Fotos adicionadas com sucesso!');
             onFotosAdicionadas();
         } catch (error) {
-            console.error('Erro ao adicionar fotos', error);
-            alert('Erro ao adicionar fotos. Tente novamente.');
+            console.error('Erro ao fazer upload das fotos', error);
+            alert(error.response?.data?.message || 'Erro ao fazer upload das fotos');
         }
     };
 
     return (
-        <div>
-            <label
-                htmlFor="file-upload"
-                style={{
-                    display: 'inline-block',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    padding: '10px 15px',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                }}
-            >
-                Adicionar Fotos
-            </label>
-            <input
-                id="file-upload"
-                type="file"
-                multiple
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
-            />
-        </div>
+        <form onSubmit={handleSubmit}>
+            <input type="file" multiple onChange={handleFileChange} />
+            {Array.from(imagens).map((imagem, index) => (
+                <div key={index}>
+                    <input
+                        type="text"
+                        placeholder="Título"
+                        value={fotosInfo[index]?.titulo || ""}
+                        onChange={(e) => handleInputChange(index, 'titulo', e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Descrição"
+                        value={fotosInfo[index]?.descricao || ""}
+                        onChange={(e) => handleInputChange(index, 'descricao', e.target.value)}
+                    />
+                </div>
+            ))}
+            <button type="submit">Adicionar Fotos</button>
+        </form>
     );
 };
 

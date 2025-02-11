@@ -1,5 +1,3 @@
-// frontend/AlbumDetail/index.js
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
@@ -10,8 +8,9 @@ const AlbumDetail = () => {
     const navigate = useNavigate();
     const [album, setAlbum] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [modalContent, setModalContent] = useState(null);
 
-    // Mova a definição da função `refreshAlbum` aqui
+
     const refreshAlbum = async () => {
         try {
             const response = await axios.get(`http://localhost:5000/auth/album/${albumId}`);
@@ -56,6 +55,14 @@ const AlbumDetail = () => {
         }
     };
 
+    const handleImgClick = (foto) => {
+        setModalContent(foto);
+    };
+
+    const closeModal = () => {
+        setModalContent(null);
+    };
+
     if (loading) return <p>Carregando...</p>;
     if (!album) return <p>Álbum não encontrado.</p>;
 
@@ -70,11 +77,11 @@ const AlbumDetail = () => {
                 {album.fotos && album.fotos.length > 0 ? (
                     album.fotos.map((foto, index) => (
                         <div key={index} style={{ textAlign: "center" }}>
-                            {console.log(`Renderizando tag <img> para: http://localhost:5000/uploads/${foto.filename}`)}
                             <img
                                 src={`http://localhost:5000/uploads/${foto.filename}`}
                                 alt={foto.titulo}
-                                style={{ width: "100%", height: "auto", borderRadius: "8px" }}
+                                style={{ width: "100%", height: "auto", borderRadius: "8px", cursor: "pointer" }}
+                                onClick={() => handleImgClick(foto)}
                             />
                         </div>
                     ))
@@ -100,6 +107,22 @@ const AlbumDetail = () => {
             >
                 Excluir Álbum
             </button>
+
+            {modalContent && (
+                <div style={{
+                    position: 'fixed', top: '0', left: '0', width: '100%', height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center'
+                }}>
+                    <div style={{
+                        backgroundColor: 'white', padding: '20px', borderRadius: '10px', maxWidth: '500px', width: '100%'
+                    }}>
+                        <h2>{modalContent.titulo}</h2>
+                        <p>{modalContent.descricao}</p>
+                        <img src={`http://localhost:5000/uploads/${modalContent.filename}`} alt={modalContent.titulo} style={{ width: '100%' }} />
+                        <button onClick={closeModal} style={{ marginTop: '10px', padding: '10px' }}>Fechar</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

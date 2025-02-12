@@ -26,6 +26,7 @@ const UploadFotos = ({ albumId, onFotosAdicionadas }) => {
             formData.append('imagens', imagens[i]);
             formData.append(`fotosInfo[${i}][titulo]`, fotosInfo[i]?.titulo || "");
             formData.append(`fotosInfo[${i}][descricao]`, fotosInfo[i]?.descricao || "");
+            formData.append(`fotosInfo[${i}][corPredominante]`, fotosInfo[i]?.corPredominante || "desconhecida");
         }
 
         try {
@@ -38,7 +39,7 @@ const UploadFotos = ({ albumId, onFotosAdicionadas }) => {
             await axios.post(`http://localhost:5000/auth/album/${albumId}/fotos`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`,  // Incluindo o token no cabeçalho
+                    Authorization: `Bearer ${token}`,
                 },
             });
             alert('Fotos adicionadas com sucesso!');
@@ -65,6 +66,12 @@ const UploadFotos = ({ albumId, onFotosAdicionadas }) => {
                         placeholder="Descrição"
                         value={fotosInfo[index]?.descricao || ""}
                         onChange={(e) => handleInputChange(index, 'descricao', e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Cor Predominante"
+                        value={fotosInfo[index]?.corPredominante || ""}
+                        onChange={(e) => handleInputChange(index, 'corPredominante', e.target.value)}
                     />
                 </div>
             ))}

@@ -28,7 +28,7 @@ const createAlbum = async (req, res) => {
             descricao: fotosInfo[index]?.descricao || "Foto carregada",
             dataDeAquisicao: new Date(),
             tamanho: img.size,
-            corPredominante: "Desconhecido"
+            corPredominante: fotosInfo[index]?.corPredominante || "Desconhecido"
         }));
 
         const novoAlbum = new Album({
@@ -63,7 +63,7 @@ const addPhotosToAlbum = async (req, res) => {
             descricao: fotosInfo[index]?.descricao || "Foto carregada",
             dataDeAquisicao: new Date(),
             tamanho: img.size,
-            corPredominante: "Desconhecido"
+            corPredominante: fotosInfo[index]?.corPredominante || "Desconhecido"
         }));
 
         const album = await Album.findById(id);

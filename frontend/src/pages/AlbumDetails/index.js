@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import UploadFotos from "./UploadFotos";
 import Modal from "../../components/Modal/index"; // Importando o componente Modal
+import { Container, PhotoGrid, PhotoFrame, PhotoImage, PhotoTitle, Button, ButtonContainer, DeleteButton , UploadFormContainer, AddPhotoButton, BackButton} from "./styles";
 
 const AlbumDetail = () => {
     const { albumId } = useParams();
@@ -12,6 +13,7 @@ const AlbumDetail = () => {
     const [viewMode, setViewMode] = useState("miniatura");
     const [selectedPhoto, setSelectedPhoto] = useState(null); // Adicionando estado para a foto selecionada
     const [selectedPhotos, setSelectedPhotos] = useState([]);
+    const [showUploadForm, setShowUploadForm] = useState(false);
 
     const refreshAlbum = async () => {
         try {
@@ -103,171 +105,133 @@ const AlbumDetail = () => {
     console.log("Estado do álbum:", album);
 
     return (
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
-            <h1 style={{ textAlign: "left" }}>{album.titulo}</h1>
-            <p style={{ textAlign: "left", color: "#555" }}>{album.descricao}</p>
-
-            <div>
-                <button 
-                    onClick={() => setViewMode("miniatura")}
-                    style={{
-                        backgroundColor: viewMode === "miniatura" ? "#007BFF" : "#ccc",
-                        color: viewMode === "miniatura" ? "#fff" : "#000",
-                        padding: "10px 15px",
-                        margin: "5px",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer"
-                    }}
-                >
-                    Miniatura
-                </button>
-                <button 
-                    onClick={() => setViewMode("tabela")}
-                    style={{
-                        backgroundColor: viewMode === "tabela" ? "#007BFF" : "#ccc",
-                        color: viewMode === "tabela" ? "#fff" : "#000",
-                        padding: "10px 15px",
-                        margin: "5px",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer"
-                    }}
-                >
-                    Tabela
-                </button>
-            </div>
-
+        <Container>
+            <BackButton onClick={() => navigate("/home")}>Voltar</BackButton>
+             <h1 style={{ textAlign: "left", color: "#333" }}>{album.titulo}</h1>
+             <p style={{ textAlign: "left", color: "#555" }}>{album.descricao}</p>
+  
+            <ButtonContainer>
+              <Button
+                active={viewMode === "miniatura"}
+                onClick={() => setViewMode("miniatura")}
+              >
+                Miniatura
+              </Button>
+              <Button
+                active={viewMode === "tabela"}
+                onClick={() => setViewMode("tabela")}
+              >
+                Tabela
+              </Button>
+            </ButtonContainer>
+        
             {viewMode === "miniatura" ? (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginTop: "20px" }}>
-                    {album.fotos && album.fotos.length > 0 ? (
-                        album.fotos.map((foto, index) => (
-                            <div key={index} style={{ textAlign: "center" }}>
-                                {console.log(`Renderizando tag <img> para: http://localhost:5000/uploads/${foto.filename}`)}
-                                <img
-                                    src={`http://localhost:5000/uploads/${foto.filename}`}
-                                    alt={foto.titulo}
-                                    style={{ width: "100%", height: "auto", borderRadius: "8px", cursor: "pointer" }}
-                                    onClick={() => handleImageClick(foto)} 
-                                />
-                            </div>
-                        ))
-                    ) : (
-                        <p>Nenhuma imagem disponível.</p>
-                    )}
-                </div>
+              <PhotoGrid>
+                {album.fotos && album.fotos.length > 0 ? (
+                  album.fotos.map((foto, index) => (
+                    <PhotoFrame key={index} onClick={() => handleImageClick(foto)}>
+                      <PhotoImage
+                        src={`http://localhost:5000/uploads/${foto.filename}`}
+                        alt={foto.titulo}
+                      />
+                      <PhotoTitle>{foto.titulo}</PhotoTitle>
+                    </PhotoFrame>
+                  ))
+                ) : (
+                  <p>Nenhuma imagem disponível.</p>
+                )}
+              </PhotoGrid>
             ) : (
-                <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
-                    <thead>
-                        <tr>
-                            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Título</th>
-                            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Descrição</th>
-                            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Data de Aquisição</th>
-                            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Tamanho</th>
-                            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Cor Predominante</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {album.fotos && album.fotos.length > 0 ? (
-                            album.fotos.map((foto, index) => (
-                                <tr key={index} onClick={() => handleImageClick(foto)} style={{ cursor: "pointer" }}>
-                                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{foto.titulo}</td>
-                                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{foto.descricao}</td>
-                                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{new Date(foto.dataDeAquisicao).toLocaleDateString()}</td>
-                                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{foto.tamanho} KB</td>
-                                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{foto.corPredominante}</td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="5" style={{ border: "1px solid #ddd", padding: "8px", textAlign: "center" }}>Nenhuma imagem disponível.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+              <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>Título</th>
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>Descrição</th>
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>Data de Aquisição</th>
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>Tamanho</th>
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>Cor Predominante</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {album.fotos && album.fotos.length > 0 ? (
+                    album.fotos.map((foto, index) => (
+                      <tr key={index} onClick={() => handleImageClick(foto)} style={{ cursor: "pointer" }}>
+                        <td style={{ border: "1px solid #ddd", padding: "8px" }}>{foto.titulo}</td>
+                        <td style={{ border: "1px solid #ddd", padding: "8px" }}>{foto.descricao}</td>
+                        <td style={{ border: "1px solid #ddd", padding: "8px" }}>{new Date(foto.dataDeAquisicao).toLocaleDateString()}</td>
+                        <td style={{ border: "1px solid #ddd", padding: "8px" }}>{foto.tamanho} KB</td>
+                        <td style={{ border: "1px solid #ddd", padding: "8px" }}>{foto.corPredominante}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" style={{ border: "1px solid #ddd", padding: "8px", textAlign: "center" }}>Nenhuma imagem disponível.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             )}
-
-            <UploadFotos albumId={albumId} onFotosAdicionadas={refreshAlbum} />
-
-
+    
+            {!showUploadForm && (
+              <AddPhotoButton onClick={() => setShowUploadForm(true)}>
+                Adicionar Fotos
+              </AddPhotoButton>
+            )}
+    
+            {showUploadForm && (
+              <UploadFormContainer>
+                <UploadFotos albumId={albumId} onFotosAdicionadas={refreshAlbum} />
+                <Button onClick={() => setShowUploadForm(false)}>Cancelar</Button>
+              </UploadFormContainer>
+            )}
+    
             {selectedPhotos.length > 0 && (
-                <button
-                    onClick={handleDeletePhotos}
-                    style={{
-                        marginTop: "20px",
-                        backgroundColor: "red",
-                        color: "white",
-                        padding: "10px 15px",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                    }}
-                >
-                    Excluir Fotos Selecionadas
-                </button>
+              <DeleteButton onClick={handleDeletePhotos}>
+                Excluir Fotos Selecionadas
+              </DeleteButton>
             )}
-
-            <button
-                onClick={handleDeleteAlbum}
-                style={{
-                    marginTop: "20px",
-                    backgroundColor: "red",
-                    color: "white",
-                    padding: "10px 15px",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                }}
-            >
-                Excluir Álbum
-            </button>
+    
+            <DeleteButton onClick={handleDeleteAlbum}>
+              Excluir Álbum
+            </DeleteButton>
 
             <Modal isOpen={!!selectedPhoto} onClose={closeModal}>
                 {selectedPhoto && (
                     <div>
                         <h3>{selectedPhoto.titulo}</h3>
                         <p>{selectedPhoto.descricao}</p>
-            <img
-                src={`http://localhost:5000/uploads/${selectedPhoto.filename}`}
-                alt={selectedPhoto.titulo}
-                style={{ width: "100%", height: "auto", borderRadius: "8px" }}
-            />
-            <button
-                onClick={async () => {
-                    const token = localStorage.getItem("token");
-                    if (!token) {
-                        alert("Você precisa estar logado para excluir uma foto.");
-                        return;
-                    }
+                        <img
+                            src={`http://localhost:5000/uploads/${selectedPhoto.filename}`}
+                            alt={selectedPhoto.titulo}
+                            style={{ width: "100%", height: "auto", borderRadius: "8px" }}
+                        />
+                        <DeleteButton
+                            onClick={async () => {
+                                const token = localStorage.getItem("token");
+                                if (!token) {
+                                    alert("Você precisa estar logado para excluir uma foto.");
+                                    return;
+                                }
 
-                    try {
-                        await axios.delete(`http://localhost:5000/auth/album/${albumId}/fotos/${selectedPhoto._id}`, {
-                            headers: { Authorization: `Bearer ${token}` },
-                        });
-                        alert("Foto excluída com sucesso!");
-                        refreshAlbum();
-                        closeModal();
-                    } catch (error) {
-                        console.error("Erro ao excluir a foto", error);
-                        alert(error.response?.data?.message || "Erro ao excluir a foto");
-                    }
-                }}
-                style={{
-                    marginTop: "20px",
-                    backgroundColor: "red",
-                    color: "white",
-                    padding: "10px 15px",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                }}
-            >
-                Excluir Foto
-            </button>
-            </div>
-            )}
-        </Modal>
-    </div>
+                                try {
+                                    await axios.delete(`http://localhost:5000/auth/album/${albumId}/fotos/${selectedPhoto._id}`, {
+                                        headers: { Authorization: `Bearer ${token}` },
+                                    });
+                                    alert("Foto excluída com sucesso!");
+                                    refreshAlbum();
+                                    closeModal();
+                                } catch (error) {
+                                    console.error("Erro ao excluir a foto", error);
+                                    alert(error.response?.data?.message || "Erro ao excluir a foto");
+                                }
+                            }}
+                        >
+                            Excluir Foto
+                        </DeleteButton>
+                    </div>
+                )}
+            </Modal>
+        </Container>
     );
 };
 

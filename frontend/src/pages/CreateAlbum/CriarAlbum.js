@@ -1,89 +1,103 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Button from "../../components/Button";
-import * as C from "./styles";
+import {
+  Container,
+  Form,
+  Label,
+  Input,
+  TextArea,
+  ButtonContainer,
+  PrimaryButton,
+  SecondaryButton,
+} from "./styles";
 
 const CriarAlbum = () => {
-    const navigate = useNavigate();
-    
-    // Estados para armazenar os dados do formulário
-    const [titulo, setTitulo] = useState("");
-    const [descricao, setDescricao] = useState("");
-    const [imagens, setImagens] = useState([]);
+  const navigate = useNavigate();
 
-    // Função para capturar as imagens selecionadas
-    const handleFileChange = (e) => {
-        setImagens(e.target.files);
-    };
+  // Estados para armazenar os dados do formulário
+  const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [imagens, setImagens] = useState([]);
 
-    // Função para enviar os dados ao backend
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  // Função para capturar as imagens selecionadas
+  const handleFileChange = (e) => {
+    setImagens(e.target.files);
+  };
 
-        if (!titulo || !descricao || imagens.length === 0) {
-            alert("Preencha todos os campos e adicione pelo menos uma imagem.");
-            return;
-        }
+  // Função para enviar os dados ao backend
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        const formData = new FormData();
-        formData.append("titulo", titulo);
-        formData.append("descricao", descricao);
+    if (!titulo || !descricao || imagens.length === 0) {
+      alert("Preencha todos os campos e adicione pelo menos uma imagem.");
+      return;
+    }
 
-        // Adiciona as imagens ao FormData
-        for (let i = 0; i < imagens.length; i++) {
-            formData.append("imagens", imagens[i]);
-        }
+    const formData = new FormData();
+    formData.append("titulo", titulo);
+    formData.append("descricao", descricao);
 
-        try {
-            const token = localStorage.getItem("token");
-            await axios.post("http://localhost:5000/auth/albuns", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+    // Adiciona as imagens ao FormData
+    for (let i = 0; i < imagens.length; i++) {
+      formData.append("imagens", imagens[i]);
+    }
 
-            alert("Álbum criado com sucesso!");
-            navigate("/home");
-        } catch (error) {
-            console.error("Erro ao criar álbum", error);
-            alert("Erro ao criar álbum, tente novamente.");
-        }
-    };
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/auth/albuns", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    return (
-        <C.Container>
-            <C.Form onSubmit={handleSubmit}>
-                <C.Label>Título do Álbum</C.Label>
-                <C.Input
-                    type="text"
-                    value={titulo}
-                    onChange={(e) => setTitulo(e.target.value)}
-                    required
-                />
+      alert("Álbum criado com sucesso!");
+      navigate("/home");
+    } catch (error) {
+      console.error("Erro ao criar álbum", error);
+      alert("Erro ao criar álbum, tente novamente.");
+    }
+  };
 
-                <C.Label>Descrição</C.Label>
-                <C.TextArea
-                    value={descricao}
-                    onChange={(e) => setDescricao(e.target.value)}
-                    required
-                />
+  return (
+    <Container>
+      <Form onSubmit={handleSubmit}>
+        <Label>Título do Álbum</Label>
+        <Input
+          type="text"
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
+          placeholder="Digite o título do álbum"
+          required
+        />
 
-                <C.Label>Adicionar Fotos</C.Label>
-                <C.Input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    accept="image/*"
-                    required
-                />
+        <Label>Descrição</Label>
+        <TextArea
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          placeholder="Digite a descrição do álbum"
+          required
+        />
 
-                <Button Text="Criar Álbum" Type="submit" />
-                <Button Text="Cancelar" onClick={() => navigate("/home")} />
-            </C.Form>
-        </C.Container>
-    );
+        <Label>Adicionar Fotos</Label>
+        <Input
+          type="file"
+          multiple
+          onChange={handleFileChange}
+          accept="image/*"
+          required
+        />
+
+        <ButtonContainer>
+          <SecondaryButton type="button" onClick={() => navigate("/home")}>
+            Cancelar
+          </SecondaryButton>
+          <PrimaryButton type="submit">Criar Álbum</PrimaryButton>
+        </ButtonContainer>
+      </Form>
+    </Container>
+  );
 };
 
 export default CriarAlbum;

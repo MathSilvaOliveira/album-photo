@@ -15,7 +15,7 @@ const upload = multer({ storage: storage });
 
 const createAlbum = async (req, res) => {
     try {
-        const { titulo, descricao, fotosInfo } = req.body; // Adicionar fotosInfo ao corpo da solicitação
+        const { titulo, descricao, fotosInfo } = req.body;
         const imagens = req.files;
 
         if (!titulo || !descricao || !imagens || imagens.length === 0) {
@@ -47,11 +47,10 @@ const createAlbum = async (req, res) => {
     }
 };
 
-
 const addPhotosToAlbum = async (req, res) => {
     try {
         const { id } = req.params;
-        const { fotosInfo } = req.body; // Adicionar fotosInfo ao corpo da solicitação
+        const { fotosInfo } = req.body;
         const imagens = req.files;
 
         if (!imagens || imagens.length === 0) {
@@ -82,4 +81,33 @@ const addPhotosToAlbum = async (req, res) => {
     }
 };
 
-module.exports = { createAlbum, upload, addPhotosToAlbum };
+const deletePhoto = async (req, res) => {
+    try {
+        console.log('Rota de exclusão de foto acessada'); // Depuração
+        console.log('ID do álbum:', req.params.albumId); // Depuração
+        console.log('ID da foto:', req.params.fotoId); // Depuração
+
+        const album = await Album.findById(req.params.albumId);
+        if (!album) {
+            console.log('Álbum não encontrado'); // Depuração
+            return res.status(404).json({ error: 'Álbum não encontrado' });
+        }
+
+        const photoIndex = album.fotos.findIndex(foto => foto._id.toString() === req.params.fotoId);
+        if (photoIndex === -1) {
+            console.log('Foto não encontrada'); // Depuração
+            return res.status(404).json({ error: 'Foto não encontrada' });
+        }
+
+        album.fotos.splice(photoIndex, 1);
+        await album.save();
+
+        console.log('Foto excluída com sucesso'); // Depuração
+        res.status(200).json({ message: 'Foto excluída com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir a foto', error);
+        res.status(500).json({ error: 'Erro ao excluir a foto' });
+    }
+};
+
+module.exports = { createAlbum, upload, addPhotosToAlbum, deletePhoto };

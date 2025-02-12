@@ -11,6 +11,7 @@ const AlbumDetail = () => {
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState("miniatura");
     const [selectedPhoto, setSelectedPhoto] = useState(null); // Adicionando estado para a foto selecionada
+    const [selectedPhotos, setSelectedPhotos] = useState([]);
 
     const refreshAlbum = async () => {
         try {
@@ -58,6 +59,38 @@ const AlbumDetail = () => {
 
     const handleImageClick = (foto) => {
         setSelectedPhoto(foto);
+    };
+
+    const handlePhotoSelection = (foto) => {
+        setSelectedPhotos((prevSelected) => {
+            if (prevSelected.includes(foto._id)) {
+                return prevSelected.filter(id => id !== foto._id);
+            } else {
+                return [...prevSelected, foto._id];
+            }
+        });
+    };
+
+    const handleDeletePhotos = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Você precisa estar logado para excluir fotos.");
+            return;
+        }
+
+        try {
+            for (const fotoId of selectedPhotos) {
+                await axios.delete(`http://localhost:5000/auth/album/${albumId}/fotos/${fotoId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+            }
+            setSelectedPhotos([]);
+            refreshAlbum();
+            alert("Fotos excluídas com sucesso!");
+        } catch (error) {
+            console.error("Erro ao excluir as fotos", error);
+            alert(error.response?.data?.message || "Erro ao excluir as fotos");
+        }
     };
 
     const closeModal = () => {
@@ -115,7 +148,7 @@ const AlbumDetail = () => {
                                     src={`http://localhost:5000/uploads/${foto.filename}`}
                                     alt={foto.titulo}
                                     style={{ width: "100%", height: "auto", borderRadius: "8px", cursor: "pointer" }}
-                                    onClick={() => handleImageClick(foto)} // Adicionando evento de clique
+                                    onClick={() => handleImageClick(foto)} 
                                 />
                             </div>
                         ))
@@ -156,6 +189,24 @@ const AlbumDetail = () => {
 
             <UploadFotos albumId={albumId} onFotosAdicionadas={refreshAlbum} />
 
+
+            {selectedPhotos.length > 0 && (
+                <button
+                    onClick={handleDeletePhotos}
+                    style={{
+                        marginTop: "20px",
+                        backgroundColor: "red",
+                        color: "white",
+                        padding: "10px 15px",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                    }}
+                >
+                    Excluir Fotos Selecionadas
+                </button>
+            )}
+
             <button
                 onClick={handleDeleteAlbum}
                 style={{
@@ -176,16 +227,49 @@ const AlbumDetail = () => {
                     <div>
                         <h3>{selectedPhoto.titulo}</h3>
                         <p>{selectedPhoto.descricao}</p>
-                        <img
-                            src={`http://localhost:5000/uploads/${selectedPhoto.filename}`}
-                            alt={selectedPhoto.titulo}
-                            style={{ width: "100%", height: "auto", borderRadius: "8px" }}
-                        />
-                    </div>
-                )}
-            </Modal>
-        </div>
+            <img
+                src={`http://localhost:5000/uploads/${selectedPhoto.filename}`}
+                alt={selectedPhoto.titulo}
+                style={{ width: "100%", height: "auto", borderRadius: "8px" }}
+            />
+            <button
+                onClick={async () => {
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                        alert("Você precisa estar logado para excluir uma foto.");
+                        return;
+                    }
+
+                    try {
+                        await axios.delete(`http://localhost:5000/auth/album/${albumId}/fotos/${selectedPhoto._id}`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                        });
+                        alert("Foto excluída com sucesso!");
+                        refreshAlbum();
+                        closeModal();
+                    } catch (error) {
+                        console.error("Erro ao excluir a foto", error);
+                        alert(error.response?.data?.message || "Erro ao excluir a foto");
+                    }
+                }}
+                style={{
+                    marginTop: "20px",
+                    backgroundColor: "red",
+                    color: "white",
+                    padding: "10px 15px",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                }}
+            >
+                Excluir Foto
+            </button>
+            </div>
+            )}
+        </Modal>
+    </div>
     );
 };
 
 export default AlbumDetail;
+

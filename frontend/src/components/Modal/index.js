@@ -6,8 +6,8 @@ const Modal = ({ isOpen, onClose, children, title, description }) => {
     return (
         <div style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
+            top: '0',
+            left: '0',
             width: '100%',
             height: '100%',
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -21,7 +21,10 @@ const Modal = ({ isOpen, onClose, children, title, description }) => {
                 background: '#fff',
                 padding: '20px',
                 borderRadius: '8px',
-                boxShadow: '0 0 10px rgba(0, 0, 0, 0.25)'
+                boxShadow: '0 0 10px rgba(0, 0, 0, 0.25)',
+                maxWidth: '90%',
+                maxHeight: '90%',
+                overflowY: 'auto'
             }}>
                 <button onClick={onClose} style={{
                     position: 'absolute',

@@ -1,5 +1,5 @@
 const express = require('express');
-const { createAlbum, upload, addPhotosToAlbum } = require('../controllers/albumController');
+const { createAlbum, upload, addPhotosToAlbum, deletePhoto } = require('../controllers/albumController');
 const router = express.Router();
 const Album = require("../models/Album");
 const authMiddleware = require("../middleware/authMiddleware")
@@ -35,6 +35,9 @@ router.get('/album/:id', async (req, res) => {
   }
 });
 
+// Rota para excluir uma foto de um álbum
+router.delete('/album/:albumId/fotos/:fotoId', authMiddleware, deletePhoto);
+
 router.delete('/album/:id', authMiddleware, async (req, res) => {
   try {
       const album = await Album.findById(req.params.id);
@@ -55,6 +58,6 @@ router.delete('/album/:id', authMiddleware, async (req, res) => {
       res.status(500).json({ error: 'Erro ao excluir o álbum' });
   }
 });
-  
+
 
 module.exports = router;

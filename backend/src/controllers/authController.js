@@ -7,10 +7,18 @@ const registerUser = async (req, res) => {
 
     const { nome, email, senha } = req.body;
 
-    console.log("Recebido no req.body:", req.body); 
+    console.log("Recebido no req.body:", req.body);
 
     if (!nome || !email || !senha) {
         return res.status(400).json({ message: "Preencha todos os campos" });
+    }
+
+    // Validação de senha forte (mínimo de 8 caracteres, pelo menos 1 número, 1 letra maiúscula e 1 caractere especial)
+    const senhaValida = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!senhaValida.test(senha)) {
+        return res.status(400).json({
+            message: "A senha deve ter pelo menos 8 caracteres, incluindo 1 letra maiúscula, 1 número e 1 caractere especial."
+        });
     }
 
     try {
@@ -22,13 +30,13 @@ const registerUser = async (req, res) => {
 
         const hashedsenha = await bcrypt.hash(senha, 10);
 
-        console.log("Senha hasheada:", hashedsenha); 
+        console.log("Senha hasheada:", hashedsenha);
 
         const user = await User.create({ nome, email, senha: hashedsenha });
 
         res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
     } catch (error) {
-        console.error("Erro no servidor:", error); 
+        console.error("Erro no servidor:", error);
         res.status(500).json({ message: "Erro no servidor" });
     }
 };

@@ -27,18 +27,21 @@ const Signup = () => {
     
         try {
             const res = await signup(nome, email, senha); 
-    
-            if (res && res.error) { 
-                setError(res.error);
+        
+            if (res && res.error) {
+                setError(res.error); 
                 return;
             }
-    
-            navigate("/");
+        
+
+            navigate("/"); 
+            alert("Usuario Cadastrado com sucesso!")
         } catch (err) {
             setError("Erro ao cadastrar. Tente novamente mais tarde.");
             console.error(err);
         }
     };
+    
 
     return (
         <C.Container>

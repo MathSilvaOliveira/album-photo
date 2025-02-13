@@ -5,7 +5,6 @@ const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    
     const token = localStorage.getItem("token");
     if (token) {
       setIsAuthenticated(true); 
@@ -22,14 +21,15 @@ const useAuth = () => {
       });
       console.log("Resposta do backend:", response.data);
       
-      // Salvar token após cadastro
       localStorage.setItem("token", response.data.token);
       setIsAuthenticated(true);
 
-      return response.data;
+      return response.data; 
     } catch (error) {
       console.error("Erro ao cadastrar usuário:", error);
-      return error.response?.data?.message || "Erro no servidor";
+
+
+      return { error: error.response?.data?.message || "Erro no servidor" };
     }
   };
 
@@ -47,7 +47,7 @@ const useAuth = () => {
       return response.data;
     } catch (error) {
       console.error("Erro ao fazer login:", error);
-      return error.response?.data?.message || "Erro no servidor";
+      return { error: error.response?.data?.message || "Erro no servidor" };
     }
   };
 

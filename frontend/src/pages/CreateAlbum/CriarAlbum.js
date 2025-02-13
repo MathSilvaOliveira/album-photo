@@ -15,17 +15,28 @@ import {
 const CriarAlbum = () => {
   const navigate = useNavigate();
 
-  // Estados para armazenar os dados do formulário
+
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [imagens, setImagens] = useState([]);
+  const [fotosInfo, setFotosInfo] = useState([]);
 
-  // Função para capturar as imagens selecionadas
   const handleFileChange = (e) => {
     setImagens(e.target.files);
+    setFotosInfo(Array.from(e.target.files).map(() => ({
+      titulo: "",
+      descricao: "",
+      corPredominante: "",
+    })));
   };
 
-  // Função para enviar os dados ao backend
+
+  const handleFotoInfoChange = (index, field, value) => {
+    const updatedFotosInfo = [...fotosInfo];
+    updatedFotosInfo[index] = { ...updatedFotosInfo[index], [field]: value };
+    setFotosInfo(updatedFotosInfo);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -34,14 +45,21 @@ const CriarAlbum = () => {
       return;
     }
 
+    if (fotosInfo.length !== imagens.length) {
+      alert("O número de informações de fotos não corresponde ao número de imagens.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("titulo", titulo);
     formData.append("descricao", descricao);
 
-    // Adiciona as imagens ao FormData
+
     for (let i = 0; i < imagens.length; i++) {
       formData.append("imagens", imagens[i]);
     }
+
+    formData.append("fotosInfo", JSON.stringify(fotosInfo));
 
     try {
       const token = localStorage.getItem("token");
@@ -88,6 +106,28 @@ const CriarAlbum = () => {
           accept="image/*"
           required
         />
+
+        {/* Renderiza campos de informações para cada foto */}
+        {Array.from(imagens).map((_, index) => (
+          <div key={index}>
+            <Label>Informações da Foto {index + 1}</Label>
+            <Input
+              type="text"
+              placeholder="Título da Foto"
+              onChange={(e) => handleFotoInfoChange(index, "titulo", e.target.value)}
+            />
+            <Input
+              type="text"
+              placeholder="Descrição da Foto"
+              onChange={(e) => handleFotoInfoChange(index, "descricao", e.target.value)}
+            />
+            <Input
+              type="text"
+              placeholder="Cor Predominante"
+              onChange={(e) => handleFotoInfoChange(index, "corPredominante", e.target.value)}
+            />
+          </div>
+        ))}
 
         <ButtonContainer>
           <SecondaryButton type="button" onClick={() => navigate("/home")}>

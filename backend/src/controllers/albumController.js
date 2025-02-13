@@ -15,37 +15,40 @@ const upload = multer({ storage: storage });
 
 const createAlbum = async (req, res) => {
     try {
-        const { titulo, descricao, fotosInfo } = req.body;
-        const imagens = req.files;
-
-        if (!titulo || !descricao || !imagens || imagens.length === 0) {
-            return res.status(400).json({ error: 'Título, descrição e ao menos uma imagem são obrigatórios' });
-        }
-
-        const fotos = imagens.map((img, index) => ({
-            filename: img.filename,
-            titulo: fotosInfo[index]?.titulo || img.originalname,
-            descricao: fotosInfo[index]?.descricao || "Foto carregada",
-            dataDeAquisicao: new Date(),
-            tamanho: img.size,
-            corPredominante: fotosInfo[index]?.corPredominante || "Desconhecido"
-        }));
-
-        const novoAlbum = new Album({
-            titulo,
-            descricao,
-            fotos,
-            usuario: req.user.id,
-        });
-
-        await novoAlbum.save();
-
-        res.status(201).json({ message: 'Álbum criado com sucesso', album: novoAlbum });
+      const { titulo, descricao } = req.body;
+      const imagens = req.files;
+  
+      if (!titulo || !descricao || !imagens || imagens.length === 0) {
+        return res.status(400).json({ error: 'Título, descrição e ao menos uma imagem são obrigatórios' });
+      }
+  
+      // Converte fotosInfo de string JSON para array
+      const fotosInfo = JSON.parse(req.body.fotosInfo);
+  
+      const fotos = imagens.map((img, index) => ({
+        filename: img.filename,
+        titulo: fotosInfo[index]?.titulo || img.originalname,
+        descricao: fotosInfo[index]?.descricao || "Foto carregada",
+        dataDeAquisicao: new Date(),
+        tamanho: img.size,
+        corPredominante: fotosInfo[index]?.corPredominante || "Desconhecido"
+      }));
+  
+      const novoAlbum = new Album({
+        titulo,
+        descricao,
+        fotos,
+        usuario: req.user.id,
+      });
+  
+      await novoAlbum.save();
+  
+      res.status(201).json({ message: 'Álbum criado com sucesso', album: novoAlbum });
     } catch (error) {
-        console.error('Erro ao criar o álbum', error);
-        res.status(500).json({ error: 'Erro ao criar álbum, tente novamente' });
+      console.error('Erro ao criar o álbum', error);
+      res.status(500).json({ error: 'Erro ao criar álbum, tente novamente' });
     }
-};
+  };
 
 const addPhotosToAlbum = async (req, res) => {
     try {

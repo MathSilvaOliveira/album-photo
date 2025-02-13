@@ -69,6 +69,13 @@ Crie um arquivo `.env` na pasta `backend` para configurar as variáveis de ambie
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/nome_do_banco
 ```
+### Rodar os testes
+
+Dentro da pasta do backend, execute o comando:
+
+```env
+npm test
+```
 
 ---
 

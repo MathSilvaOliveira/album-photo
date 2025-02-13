@@ -1,6 +1,6 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../src/server'); // Importe o app do seu backend
+const app = require('../src/server');
 const Album = require('../src/models/Album');
 const path = require('path');
 const fs = require('fs');

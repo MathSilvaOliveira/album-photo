@@ -12,7 +12,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-
 const authRoutes = require("./routes/authRoutes");
 const uploadsPath = path.join(__dirname, '..', 'uploads');
 console.log('Caminho da pasta uploads:', uploadsPath); 
@@ -22,7 +21,11 @@ app.use("/auth", albumsRoutes);
 app.use("/auth", authRoutes);
 app.use("/auth", userRoutes);  
 
-const PORT = process.env.PORT || 5000;
+// Exporta o app para utilização no supertest
+module.exports = app;
+
+// Conecta ao banco de dados e inicia o servidor
 connectDB().then(() => {
-    app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 }).catch(err => console.error("Erro ao conectar ao banco de dados:", err));
